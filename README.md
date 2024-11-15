@@ -1,4 +1,4 @@
-# miatfrien
+# miatfren
 Miat Fren Discord bot, written in Java with Javacord.
 
 A general purpose discord bot with a focus on fun!
