@@ -1,0 +1,22 @@
+{
+  "Config": {
+    "Token": "",
+    "Prefix": "[",
+    "TranslatorFlagIgnoredChannels": [""],
+    "DeepLEnabled": true,
+    "DeepLKey": "",
+    "DeepLEmoji": "\uD83C\uDDE9",
+    "UseGoogleTranslateAsFallbackForDeepL": true,
+    "RegisterCommands": false,
+
+    "AIServerEndpoint": "http://192.168.0.29:8080/v1/chat/completions",
+    "Whitelist": [""],
+    "WebhookURL": "",
+    "StatusText": "Miat 4.0!",
+
+    "ReWordsGoodWords": [""],
+    "ReWordsGoodWordsExactMatch": [""],
+    "ReWordsBadWords": [""],
+    "ReWordsBadWordsExactMatch": [""]
+  }
+}
