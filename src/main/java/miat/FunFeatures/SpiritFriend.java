@@ -61,11 +61,11 @@ public class SpiritFriend {
         e.setTitle("Your personal Friend of the week!");
 
         String filePath = "ServerFiles/friendsNexon1.json";
-        String fullText = "";
+        StringBuilder fullText = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                fullText += line;
+                fullText.append(line);
             }
         } catch (IOException exception) {
             throw new RuntimeException(exception);
@@ -78,7 +78,7 @@ public class SpiritFriend {
                 .mod(BigInteger.valueOf(469));
         int searchID = Integer.parseInt(String.valueOf(result));
 
-        JSONArray array = new JSONArray(fullText);
+        JSONArray array = new JSONArray(fullText.toString());
         String nameEN = null;
         boolean isFound = false;
 
@@ -97,6 +97,49 @@ public class SpiritFriend {
             }
         }
         e.setDescription(nameEN + "\n\nYou'll get a new Friend next week, so check back soon!");
+        return e;
+    }
+    public static EmbedBuilder friendOfTheDay(String userID) {
+        EmbedBuilder e = new EmbedBuilder();
+        e.setTitle("Your personal Friend of the day!");
+
+        String filePath = "ServerFiles/friendsNexon1.json";
+        StringBuilder fullText = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                fullText.append(line);
+            }
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+
+        BigInteger bigInt = new BigInteger(userID);
+        BigInteger result = bigInt.mod(BigInteger.valueOf(469))
+                .multiply(BigInteger.valueOf(LocalDate.now().getDayOfYear()))
+                .add(BigInteger.valueOf(7))
+                .mod(BigInteger.valueOf(469));
+        int searchID = Integer.parseInt(String.valueOf(result));
+
+        JSONArray array = new JSONArray(fullText.toString());
+        String nameEN = null;
+        boolean isFound = false;
+
+        while (!isFound) {
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject obj = array.getJSONObject(i);
+
+                if (obj.getInt("nexonID") == searchID) {
+                    nameEN = obj.getString("nameEN");
+                    isFound = true;
+                    break;
+                }
+            }
+            if (!isFound) {
+                searchID++;
+            }
+        }
+        e.setDescription(nameEN + "\n\nCome back tomorrow for your new Friend, they'll be waiting for you!");
         return e;
     }
 }

@@ -40,6 +40,7 @@ public class MiatMain {
     static String deepLEmoji = ConfigHandler.getString("DeepLEmoji", configFile);
     static Boolean useGoogleAsFallbackForDeepL = ConfigHandler.getBoolean("UseGoogleTranslateAsFallbackForDeepL", configFile);
     static String deepLKey = ConfigHandler.getString("DeepLKey", configFile);
+    static String[] geminiChannels = ConfigHandler.getArray("GeminiChannels", configFile);
     static String[] ignoredChannels = ConfigHandler.getArray("TranslatorFlagIgnoredChannels", configFile);
     static String[] reWordsGoodWords = ConfigHandler.getArray("ReWordsGoodWords", configFile);
     static String[] reWordsGoodWordsExactMatch = ConfigHandler.getArray("ReWordsGoodWordsExactMatch", configFile);
@@ -49,19 +50,21 @@ public class MiatMain {
     static String statusText = ConfigHandler.getString("StatusText", configFile);
     static boolean registerApps = ConfigHandler.getBoolean("RegisterApps", configFile);
     public static AllowedMentions noReplyPing = new AllowedMentionsBuilder().setMentionRepliedUser(false).build();
+    public static User self;
+    static int reminder;
 
     public static void main(String[] args) {
         DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
         System.out.println(botName + " logged in.");
         int startTime = (int) (System.currentTimeMillis() / 1000);
-        User self = api.getYourself();
+        self = api.getYourself();
         String time = new Date().toString();
         Permissions admin = new PermissionsBuilder().setAllowed(PermissionType.ADMINISTRATOR).build();
         Translator translator = new Translator(); //google translate object
         if (deepLKey == null) deepLKey = "0";
         com.deepl.api.Translator deepLTranslator = new com.deepl.api.Translator(deepLKey); //deepL translator object
 
-        api.updateActivity(ActivityType.PLAYING, statusText);
+        api.updateActivity(ActivityType.COMPETING, statusText);
 
         if (registerSlashCommands) {
             System.out.println("Registering slash commands. This will take some time...");
@@ -270,13 +273,10 @@ public class MiatMain {
             String author = mc.getMessageAuthor().toString();
             String server = mc.getServer().get().toString();
             boolean rmCommandBool = false;
-            //MessageBuilder replyNoPing = new MessageBuilder().setAllowedMentions(noReplyPing).replyTo(mc.getMessage());
-            //unused for now, maybe implement a no ping option later?
 
             if (debugmessagelog) {
                 if (!mc.getMessageAuthor().equals(self) && !mc.getMessageAuthor().toString().equals("MessageAuthor (id: 919786500890173441, name: Miat Bot)")) {
                     try {
-
                         Webhook.send(ConfigHandler.getString("WebhookURL", configFile), "'" + m + "'\n\n- " + author + "\n- At " + time + " \n- " + server);
                     } catch (IOException e1) {
                         e1.printStackTrace();
@@ -415,6 +415,15 @@ public class MiatMain {
                             Respond.replyNoPing(mc,SpiritFriend.friendOfTheWeek(mc.getMessageAuthor().getIdAsString()));
                         }
                         break;
+                    case "fotd":
+                    case "friendoftheday":
+                        if (parts.length > 1) {
+                            String numbers = parts[1].replaceAll("[^0-9]","");
+                            Respond.replyNoPing(mc,SpiritFriend.friendOfTheDay(numbers));
+                        } else {
+                            Respond.replyNoPing(mc,SpiritFriend.friendOfTheDay(mc.getMessageAuthor().getIdAsString()));
+                        }
+                        break;
                     case "collatz":
                         if (parts.length > 1) {
                             String number = parts[1].replaceAll("[^0-9]","");
@@ -459,7 +468,7 @@ public class MiatMain {
                                 "1. Warm the oil in a large pot over medium-high heat. Add in the onion and garlic. Cook, stirring occasionally, for 3-4 minutes until the onion becomes translucent. \n" +
                                 "2. Add the ground beef to the pot. Cook for 5-6 minutes, breaking it apart, until browned and no pink remains.\n" +
                                 "3. Stir in the tomato paste, chili powder, cumin, salt, pepper, and cinnamon until everything is thoroughly combined.\n" +
-                                "4. Pour in the broth, tomato sauce, crushed tomatoes, and kidney beans. Stir well.\n" +
+                                "4. Pour in the broth, tomato sauce, and crushed tomatoes. Stir well.\n" +
                                 "5. Bring the liquid to a boil, then reduce heat to a gentle simmer (low to medium-low.) Cook, uncovered, for about 20 minutes, stirring occasionally to prevent sticking. \n" +
                                 "6. Remove the pot from the heat and let rest for 5 minutes.");
                     case "ml":
@@ -519,6 +528,55 @@ public class MiatMain {
                         }
                 }
             }
+            for (String channel : geminiChannels) {
+                if (Long.toString(mc.getMessage().getChannel().getId()).equals(channel))
+                    if (!mc.getMessage().getAttachments().isEmpty()) {
+                        if (mc.getMessage().getAttachments().get(0).isImage()) {
+                            Thread geminiThread = new Thread(() -> {
+                                GeminiImageCheck instance = new GeminiImageCheck();
+                                instance.check(mc);
+                            });
+                            geminiThread.start();
+                    }
+                }
+            }
+
+            if (mc.getMessage().getMentionedUsers().contains(self)) { //if it pings the bot
+                if (m.indexOf("<@" + self.getIdAsString() + ">") > 0) {
+                    String[] halves = m.split("<@" + self.getIdAsString() + ">");
+                    String[] characters = halves[0].split(", ");
+                    boolean invalidCharacter = false;
+                    boolean doConcat = false;
+                    StringBuilder invalidCharacterName = new StringBuilder();
+                    rmCommandBool = true;
+                    for (String individial : characters) {
+                        if (!GetCharacter.inList(individial)) {           //if the name of the author field is not in the list of characters
+                            invalidCharacter = true;
+                            if (doConcat == true) {
+                                invalidCharacterName.append(", ");
+                            }
+                            invalidCharacterName.append(individial);
+                            doConcat = true;
+                        }
+                    }
+                    String prompt;
+                    if (halves.length == 1) {
+                        prompt = "";
+                    } else {
+                        prompt = halves[1];
+                    }
+                    if (invalidCharacter == false) {
+                        mc.addReactionsToMessage("\uD83C\uDFDE️");
+                        Thread aiThread = new Thread(() -> {
+                            TactAI instance = new TactAI();
+                            instance.aiRequest(prompt, mc, characters);
+                            mc.removeOwnReactionByEmojiFromMessage("\uD83C\uDFDE️");
+                        });
+                        aiThread.start();
+                    }
+                }
+            }
+
             if (rmCommandBool == false) {
                 if (mc.getMessage().getReferencedMessage().isPresent() && mc.getMessage().getMentionedUsers().contains(self)) {                           //if message has reply to another message
                     Message referencedMessage = mc.getMessage().getReferencedMessage().get();       //set the replied to message to variable
@@ -581,7 +639,13 @@ public class MiatMain {
             //this is hardcoded and will stay hardcoded because i find it funny when people get told to not say the n word.
             //i dont even care about the word itself, its funny to see people act tough against a bot when they say a word.
             if (m.toLowerCase().contains("nigg") || m.toLowerCase().contains("n1gg") || m.toLowerCase().contains("kotlin user")) {
-                mc.getChannel().sendMessage("__**Racial slurs are discouraged!**__");
+                if (reminder < 10) {
+                    mc.getChannel().sendMessage("__**Racial slurs are discouraged!**__");
+                    reminder++;
+                } else {
+                    mc.getChannel().sendMessage("__**Racial slurs are discouraged!**__\n-# *Delete these reminders by reacting with :x: emoji*");
+                    reminder = 1;
+                }
             }
         });
 

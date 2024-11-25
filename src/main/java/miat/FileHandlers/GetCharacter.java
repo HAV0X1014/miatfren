@@ -80,7 +80,9 @@ public class GetCharacter {
         //take in the uncapitalized name, and return the proper capitalized and spaced version
         String[] names = getList().split(", ");
         for (String individual : names) {
-            if (individual.replace(" ","").equalsIgnoreCase(name.replace(" ",""))) {
+            if ((individual.replace(" ","").replace("-","")).equalsIgnoreCase((name.replace(" ","").replace("-","")))) {
+                //remove spaces and hyphens from both the input name and the name from the list we are testing against,
+                //then compare those two in lowercase. it needs to be like this because the 'individual' string cant be modified
                 return individual;
             }
         }

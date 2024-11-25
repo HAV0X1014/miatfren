@@ -39,6 +39,10 @@ public class Help {
                         "\n\n``"+ prefix +"collatz``: Perform the collatz conjecture with a specified starting number." +
                         "\n\n``"+ prefix +"magicnumber``: Get your magic number for this week, special to you!" +
                         "\n\n``"+ prefix +"fotw``: Find your Friend of the week, special to you! (mention another user to see their Friend of the week)" +
+                        "\n\n``"+ prefix +"fotd``: Find your Friend of the day! Functions the same as ``fotw``." +
+                        "\n\n``"+ prefix +"img:``: Use DuckDuckGo image search to find an image. Aliases ``image``, ``search``." +
+                        "\n\n``"+ prefix +"recipe``: Outputs a recipe I like to use. Works with any kind of ground meat." +
+                        "\n\n``"+ prefix +"[charactername]`` [text]``: For more information about the AI features, use the ``/miathelp ai`` command!" +
                         "\n\nAI features are in the ``/miathelp ai`` command.");
                 e.setFooter("Created By : HAV0X (@hav0x) & arsonfrog (@arsonbot)");
                 e.setColor(Color.orange);
@@ -59,7 +63,9 @@ public class Help {
                 "\n\n``miathelp``: Get help with the bot." +
                 "\n\n``invite``: Get an invite for the bot with all permissions needed." +
                 "\n\n``addcharacter``: Add a character to the AI character list. **(Whitelisted members only.)**");
-                e.addInlineField("__**Legacy Commands**__", "``" + prefix+ "ml [on|off]``: Enable or Disable the Debug Message Log. Default off. **(Whitelisted members only.)**" +
+                e.addInlineField("__**Legacy Commands**__",
+                        "``"+ prefix +"rm``: Removes the replied to message if it is a bot command that is replying to you. Useful for AI conversaitions or bad jokes. Aliases ``remove``" +
+                        "\n\n``" + prefix+ "ml [on|off]``: Enable or Disable the Debug Message Log. Default off. **(Whitelisted members only.)**" +
                         "\n\n``" + prefix + "setactivity``: Set the status of the bot. **(Whitelisted members only.)**" +
                         "\n\n``" + prefix + "remove``: Removes the bot's message only if it is replying to you. Reply to the message you want removed." +
                         "\n\n``" + prefix + "refresh``: Refresh the bot's config and AI character list. **(Whitelisted members only.)**");

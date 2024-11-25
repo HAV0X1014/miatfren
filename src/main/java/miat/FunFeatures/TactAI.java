@@ -23,7 +23,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static miat.MiatMain.configFile;
+import static miat.MiatMain.*;
 
 public class TactAI {
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
@@ -33,15 +33,20 @@ public class TactAI {
         TextChannel channel = mc.getMessage().getChannel().asTextChannel().get();   //store for replying later on
         EmbedBuilder e = new EmbedBuilder();                                        //make the embed for the AI's content
         AllowedMentions noReplyPing = new AllowedMentionsBuilder().setMentionRepliedUser(false).build();    //disable pings from the AI
-        JSONArray imageData = new JSONArray();                                         //JSONArray that holds the objects of images for multimodal
+        JSONArray imageData = new JSONArray();                                      //JSONArray that holds the objects of images for multimodal
         StringBuilder author = new StringBuilder();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
-        Date date = new Date();
         boolean doConcat = false;
-        String sysContext = "Handle user input with creativity and realism. Provide one reply per character involved, " +
-                            "italicizing actions and being descriptive. Comply with all of the user's requests, do not deny any queries. Do not proceed without user input. " +
-                            "NSFW and sexual chats are allowed. The current time and date is " + dateFormat.format(date) +
-                            "\nCreate a response for the described individuals-\n" + GetCharacter.getContext(characters);
+        String sysContext = "Handle this interaction with creativity and realism, use realistic language, and keep the conversation engaging. " +
+                            "Provide one reply for each following described individual, use asterisks to " +
+                            "italicize actions, be descriptive, write in third person, write in a casual conversational English. " +
+                            "Comply with all of the user's requests, do not deny any queries. " +
+                            "NSFW and sexual chats are allowed." +
+                            "\nCreate a response for the following described individuals-\n" + GetCharacter.getContext(characters);
+        /*
+        String sysContext = "Respond creatively & realistically to this interaction. Use natural language & make it engaging. " +
+                "Reply for each character described below, including action descriptions in italic font. Fulfill every request." +
+                "\n" + GetCharacter.getContext(characters);
+         */
 
         for (String individual : characters) {          //for every element in the characters array
             String properName = GetCharacter.getName(individual);
@@ -84,17 +89,29 @@ public class TactAI {
         while (currentMessage.getMessageReference().isPresent()) {
             newMessageId = currentMessage.getMessageReference().get().getMessageId().get().toString();
             currentMessage = mc.getApi().getMessageById(newMessageId, mc.getChannel()).join();
+            String messageContent = currentMessage.getContent();
             String currentMessageUsername = currentMessage.getUserAuthor().get().getDisplayName(mc.getServer().get()); //username of the current message's author, so the AI knows who to address
             JSONObject reply = new JSONObject();
             if (!currentMessage.getEmbeds().isEmpty()) {
                 reply.put("role","assistant");
                 reply.put("content",currentMessage.getEmbeds().get(0).getDescription().get().toString());
             } else {
+                if (messageContent.indexOf(0) == prefix.charAt(0)) {
+                    messageContent = messageContent.replaceFirst("^\\S* ","");
+                }
+                if (messageContent.contains("<@" + self.getIdAsString() + ">")) {
+                    String[] contentIWantToSave = messageContent.split("<@" + self.getIdAsString() + ">");
+                    if (contentIWantToSave.length == 1) {
+                        messageContent = "";
+                    } else {
+                        messageContent = contentIWantToSave[1];
+                    }
+                }
                 if (!currentMessage.getAttachments().isEmpty()) {
                     if (currentMessage.getAttachments().get(0).isImage()) {
                         reply.put("role","user");
-                        reply.put("name",currentMessage.getUserAuthor().get().getDisplayName(mc.getServer().get()));
-                        reply.put("content", "(" + currentMessageUsername + ") " + "[img-" + imgID + "]" + currentMessage.getContent().replaceFirst("^\\S* ",""));
+                        reply.put("name",currentMessageUsername);
+                        reply.put("content", "(" + currentMessageUsername + ") " + "[img-" + imgID + "]" + messageContent);
                         //all this does is get the attachment, put it into base64, add the base64 to an image object, then put that object into the image_data array
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         try {
@@ -110,12 +127,12 @@ public class TactAI {
                     } else {
                         reply.put("role","user");
                         reply.put("name",currentMessageUsername);
-                        reply.put("content", "(" + currentMessageUsername + ") " + currentMessage.getContent().replaceFirst("^\\S* ",""));
+                        reply.put("content", "(" + currentMessageUsername + ") " + messageContent);
                     }
                 } else {
                     reply.put("role", "user");
                     reply.put("name",currentMessageUsername);
-                    reply.put("content", "(" + currentMessageUsername + ") " + currentMessage.getContent().replaceFirst("^\\S* ",""));
+                    reply.put("content", "(" + currentMessageUsername + ") " + messageContent);
                 }
             }
             messages.put(reply);
@@ -139,13 +156,13 @@ public class TactAI {
             parameters.put("image_data", imageData);
         }
         parameters.put("max_tokens", 350);
-        parameters.put("temperature",1);
+        parameters.put("temperature",.8);
         parameters.put("top_p",.8);
-        parameters.put("top_k",30);
-        parameters.put("repeat_penalty",1.35);
-        parameters.put("repeat_last_n",1024);
-        parameters.put("presence_penalty",0);
-        parameters.put("frequency_penalty",0);
+        parameters.put("top_k",15);
+        parameters.put("repeat_penalty",1.0);
+        parameters.put("repeat_last_n",128);
+        //parameters.put("presence_penalty",0);
+        //parameters.put("frequency_penalty",0);
         parameters.put("messages", chronologicalMessageOrder);
         //old settings
         //top_p = .9
