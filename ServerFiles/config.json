@@ -1,0 +1,22 @@
+{
+  "Config": {
+    "Token": "",
+    "Prefix": "[",
+    "DeepLEnabled": true,
+    "DeepLKey": "",
+    "DeepLEmoji": "\uD83C\uDDE9",
+    "UseGoogleTranslateAsFallbackForDeepL": true,
+    "RegisterCommands": true,
+
+    "AIServerEndpoint": "",
+    "GeminiKey": "",
+    "Whitelist": [""],
+    "WebhookURL": "",
+    "StatusText": "Miat Fren 5.0!",
+
+    "ReWordsGoodWords": [""],
+    "ReWordsGoodWordsExactMatch": [""],
+    "ReWordsBadWords": [""],
+    "ReWordsBadWordsExactMatch": [""]
+  }
+}
