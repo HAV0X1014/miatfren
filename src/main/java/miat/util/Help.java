@@ -78,13 +78,14 @@ public class Help {
             case "miathelp ai":
                 e.setTitle("AI features");
                 e.setDescription("AI features are locally hosted and run. Specific model used may vary." +
-                        "\n\n- To start a chat, use `" + prefix + "` followed by the name of the character without any spaces, for example `" + prefix + "tact what is an airfoil?`." +
-                        "\n- Alternatively, you can use the full name of the character(s) you want to chat with, followed by a ping at the bot. For example `silver fox, cleck, @miat fren how are you?`" +
-                        "\n- To start a chat with multiple characters, separate the names with a comma. For example `" + prefix + "tact,cleck,topi where is the station?`." +
+                        "\n- To initiate a chat, use `" + prefix + "` followed by a character's name with no spaces, or the character's name followed by a comma and a ping at the bot." +
+                        "\n  - Examples: `" + prefix + "redcrownedcrane what is an airfoil?` or `bald eagle, @Miat Fren how far away is the moon`." +
                         "\nReply to the last message sent by a character to continue a chat." +
-                        " Image attachments sent with a message can be seen and understood by the AI. Image data may decrease chat quality." +
+                        "\n\n- You can modify your experience with `/customizeai` to add a line to the AI's system prompt." +
+                        "\n- Use `/addcustomcharacter` to add or edit a character only for you. `/deletecharacter` will remove the character." +
+                        "\n~~Image attachments sent with a message can be seen and understood by the AI. Image data may decrease chat quality.~~" +
                         "\n\n**Characters:**\n" +
-                        Character.getList(interaction.getUser().getId()));
+                        Character.getBaseCharacterList() + "\n**Your custom characters:**\n" + Character.getCustomCharacterList(interaction.getUser().getId()));
                 e.setFooter("Created By : HAV0X (@hav0x) & arsonfrog (@arsonbot)");
                 e.setColor(Color.CYAN);
                 interaction.replyEmbeds(e.build()).queue();

@@ -138,7 +138,7 @@ public class SpiritFriend {
                 searchID++;
             }
         }
-        e.setDescription(nameEN + "\n\nCome back tomorrow for your new Friend, they'll be waiting for you!");
+        e.setDescription(nameEN + "\n\nCome back tomorrow for your new Friend, they'll be waiting for you!\n-# This resets at <t:1740848400:t>");
         return e;
     }
 }

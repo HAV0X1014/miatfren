@@ -164,6 +164,18 @@ public class RegisterCommands {
                 .setIntegrationTypes(IntegrationType.ALL)
                 .setContexts(InteractionContextType.ALL));
 
+        cd.add(Commands.slash("googletranslate","Send a message in another language with Google Translate.")
+                .addOption(OptionType.STRING,"language","The language you want to send as.",true,true)
+                .addOption(OptionType.STRING,"text","The text you want to say.",true)
+                .setIntegrationTypes(IntegrationType.ALL)
+                .setContexts(InteractionContextType.ALL));
+
+        cd.add(Commands.slash("deepltranslate","Send a message in another language with DeepL.")
+                .addOption(OptionType.STRING,"language","The language you want to send as.",true,true)
+                .addOption(OptionType.STRING,"text","The text you want to say.",true)
+                .setIntegrationTypes(IntegrationType.ALL)
+                .setContexts(InteractionContextType.ALL));
+
         jda.updateCommands().addCommands(cd).queue();
         System.out.println("**Apps Registered!** Set \"RegisterApps\" to false in config.json");
     }

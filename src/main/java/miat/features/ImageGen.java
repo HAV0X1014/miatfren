@@ -92,8 +92,8 @@ public class ImageGen {
             //now we ask the AI to summarize the conversation.
             JSONObject parameters = new JSONObject();
             parameters.put("max_tokens", 400);
-            parameters.put("temperature", 1);
-            parameters.put("top_p", .9);
+            parameters.put("temperature", .6);
+            parameters.put("top_p", .95);
             parameters.put("top_k", 30);
             parameters.put("repeat_penalty", 1.0);
             parameters.put("repeat_last_n", 64);

@@ -21,6 +21,29 @@ import java.util.Iterator;
 import static miat.MiatMain.characterList;
 
 public class Character {
+    public static String getBaseCharacterList() {
+        JSONObject baseCharacters = new JSONObject(characterList);
+        //gets a sorted list of characters
+        Iterator<String> keys = baseCharacters.keys();
+        ArrayList<String> list = new ArrayList<>();
+        while (keys.hasNext()) {
+            list.add(keys.next());
+        }
+        Collections.sort(list);
+        return String.join(", ", list);
+    }
+
+    public static String getCustomCharacterList(String userId) {
+        JSONObject userCharacters = UserHandler.getObject("CustomCharacters", userId);
+        Iterator<String> keys = userCharacters.keys();
+        ArrayList<String> list = new ArrayList<>();
+        while (keys.hasNext()) {
+            list.add(keys.next());
+        }
+        Collections.sort(list);
+        return String.join(", ", list);
+    }
+
     private static JSONObject getAllCharacters(String userId) {
         JSONObject allCharacters = new JSONObject(characterList); // Copy main character list
         JSONObject userCharacters = UserHandler.getObject("CustomCharacters", userId);

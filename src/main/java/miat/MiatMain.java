@@ -12,7 +12,10 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.util.EnumSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MiatMain {
     public static String configFile;
@@ -44,12 +47,13 @@ public class MiatMain {
                 .addEventListeners(new ContextCommandHandler())
                 .addEventListeners(new ReactionAddHandler())
                 .addEventListeners(new ServerJoinHandler())
+                .addEventListeners(new AutoCompleteHandler())
                 .setActivity(Activity.customStatus(ConfigHandler.getString("StatusText")))
                 .build();
 
         messageCache = Caffeine.newBuilder()
                 .maximumSize(30000)
-                .expireAfterWrite(1, TimeUnit.DAYS)
+                .expireAfterWrite(2, TimeUnit.DAYS)
                 .build();
 
         jda.awaitReady();
@@ -73,5 +77,22 @@ public class MiatMain {
             }
         }
         System.out.println("Message caching and further setup completed.");
+
+
+        String[] statusTexts = {"どこでも翻訳者 | + Add App","Translator Anywhere | + Add App","AI chats | + Add App",
+                "/miathelp ai | + Add App","\uD83C\uDDFA\uD83C\uDDF8 English -> \uD83C\uDDEF\uD83C\uDDF5 Japanese | + Add App",
+                "+ Add App | + Add App","Add me to your account! | + Add App","\uD83C\uDDEF\uD83C\uDDF5 日本語 -> \uD83C\uDDFA\uD83C\uDDF8 英語 | + Add App",
+                "Chat across languages! | + Add App","Translate Embeds | + Add App","エンベッド翻訳者 | + Add App","\uD83D\uDC31 | + Add App",
+                prefix + "animalfact | + Add App"};
+        int num = statusTexts.length;
+        AtomicInteger current = new AtomicInteger();
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            current.incrementAndGet();
+            if (current.get() == num) {
+                current.set(0);
+            }
+            jda.getPresence().setActivity(Activity.customStatus(statusTexts[current.intValue()]));
+        },0,30,TimeUnit.SECONDS);
     }
 }

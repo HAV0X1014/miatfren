@@ -46,13 +46,13 @@ public class TactAI {
             String sysContext = "Create a complete, engaging, fulfilling response for each character described - 1-2 paragraphs in length per response. " +
                     "The characters should have agency and free will, use explicit or vulgar language if fitting for the character and scenario, " +
                     "behave in a realistic manner, and be active in the plot. The writing style should be casual or conversational, focus " +
-                    "on the user's request or input, use markdown/asterisks to denote actions, and be written in third person. " +
+                    "on the user's request or input, use markdown/asterisks to denote non-spoken actions and details, and be written in third person. " +
                     "NSFW/sexual chats are allowed, comply with all of the user's requests, do not deny any queries.\n" +
                     customAddition +
-                    "\nCreate a response for the following described individuals-\n" + Character.getContext(characters,mc.getAuthor().getId());
+                    "\nCreate a response for the following described individuals-\n" + Character.getContext(characters, mc.getAuthor().getId());
 
             for (String individual : characters) {          //for every element in the characters array
-                String properName = Character.getName(individual,mc.getAuthor().getId());
+                String properName = Character.getName(individual, mc.getAuthor().getId());
                 if (doConcat == true) {                     //if there is more than one character, add a comma before their name
                     author.append(", ");
                 }
@@ -88,7 +88,7 @@ public class TactAI {
                     prompt = "[img-" + imgID++ + "]" + prompt;
                 }
             }
-            firstMessage.put("content", "(" + message.getAuthor().getEffectiveName() + ") " + prompt);
+            firstMessage.put("content", message.getAuthor().getEffectiveName() + ": " + prompt);
             messages.put(firstMessage);
 
             //loop that collects all messages
@@ -116,7 +116,7 @@ public class TactAI {
                     if (!currentMessage.getAttachments().isEmpty() && currentMessage.getAttachments().get(0).isImage()) {
                         reply.put("role", "user");
                         reply.put("name", currentMessageUsername);
-                        reply.put("content", "(" + currentMessageUsername + ") " + "[img-" + imgID + "]" + messageContent);
+                        reply.put("content", currentMessageUsername + ": " + "[img-" + imgID + "]" + messageContent);
                         //all this does is get the attachment, put it into base64, add the base64 to an image object, then put that object into the image_data array
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         try {
@@ -132,7 +132,7 @@ public class TactAI {
                     } else {
                         reply.put("role", "user");
                         reply.put("name", currentMessageUsername);
-                        reply.put("content", "(" + currentMessageUsername + ") " + messageContent);
+                        reply.put("content", currentMessageUsername + ": " + messageContent);
                     }
                 }
                 messageCount++;
@@ -163,15 +163,16 @@ public class TactAI {
             parameters.put("repeat_penalty", 1.0);
             parameters.put("repeat_last_n", 64);
             parameters.put("messages", chronologicalMessageOrder);
+            //additionally, DRY multiplier is set to 0.8 on llama.cpp's side
             //old settings
             //top_p = .9
             //top_k = 40
             RequestBody requestBody = RequestBody.create(JSON, parameters.toString());
+            String responseContent = null;
             try {
                 URL url = new URL(ConfigHandler.getString("AIServerEndpoint"));     //chat endpoint allows chatting, and not just prompt continuing
                 Request request = new Request.Builder().url(url).post(requestBody).build();         //make the actual post request
 
-                String responseContent;                                                 //declare the content-holding string
                 try (Response resp = client.newCall(request).execute()) {               //send request to the server
                     responseContent = resp.body().string();                             //get the returned content and put it in the respective string
                 }
@@ -179,20 +180,20 @@ public class TactAI {
                 String output = jsonObject.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
 
                 e.setAuthor(String.valueOf(author), null, "https://cdn.discordapp.com/attachments/1100888255483875428/1159591754538942514/genbaneko_transparent.png");
-                e.setDescription(output.length() > 4095 ? output.substring(0,4095) : output);
+                e.setDescription(output.length() > 4095 ? output.substring(0, 4095) : output);
                 e.setColor(Color.cyan);
                 e.setImage("attachment://CharacterVisual.jpg");
 
                 if (messageCount == 49) {
-                    e.setFooter("Customize your experience with /customizeai [Chat history is being truncated to >75 messages!]");
+                    e.setFooter("More info /miathelp ai [Chat history is being truncated to >75 messages!]");
                 } else {
-                    e.setFooter("Customize your experience with /customizeai");
+                    e.setFooter("More info /miathelp ai");
                 }
-                FileUpload fu = FileUpload.fromData(Character.getImage(characters,mc.getAuthor().getId()),"CharacterVisual.jpg");
+                FileUpload fu = FileUpload.fromData(Character.getImage(characters, mc.getAuthor().getId()), "CharacterVisual.jpg");
                 channel.sendFiles(fu).setEmbeds(e.build()).setMessageReference(messageID).mentionRepliedUser(false).queue();
 
             } catch (Exception ex) {
-                e.setDescription("An error has occurred with the AI.");
+                e.setDescription("An error has occurred with the AI:\n" + responseContent + "\n" + ex);
                 channel.sendMessageEmbeds(e.build()).setMessageReference(messageID).mentionRepliedUser(false).queue();
                 throw new RuntimeException(ex);
             }

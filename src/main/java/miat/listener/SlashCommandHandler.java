@@ -185,6 +185,19 @@ public class SlashCommandHandler extends ListenerAdapter {
                 InteractionHook hook = interaction.getHook();
                 interaction.deferReply().queue();
                 hook.sendMessageEmbeds(Gemini.send(interaction).build()).queue();
+                break;
+            }
+            case "googletranslate": {
+                InteractionHook hook = interaction.getHook();
+                interaction.deferReply().queue();
+                hook.sendMessageEmbeds(Trnsl.googleSend(interaction).build()).queue();
+                break;
+            }
+            case "deepltranslate": {
+                InteractionHook hook = interaction.getHook();
+                interaction.deferReply().queue();
+                hook.sendMessageEmbeds(Trnsl.deeplSend(interaction).build()).queue();
+                break;
             }
         }
     }

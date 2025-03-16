@@ -59,7 +59,63 @@ public class ReactionAddHandler extends ListenerAdapter {
                     } catch (Exception ignored) {}
                 }
                 return;
-
+            case "\uD83C\uDDE7\uD83C\uDDEC": //Bulgarian Bulgaria
+                targetLang = Language.BULGARIAN;
+                dlLang = "bg";
+                break;
+            case "\uD83C\uDDE8\uD83C\uDDFF": //Czech Czech
+                targetLang = Language.CZECH;
+                dlLang = "cs";
+                break;
+            case "\uD83C\uDDE9\uD83C\uDDF0": //Danish Denmark
+                targetLang = Language.DANISH;
+                dlLang = "da";
+                break;
+            case "\uD83C\uDDEC\uD83C\uDDF7": //Greek Greece
+                targetLang = Language.GREEK;
+                dlLang = "el";
+                break;
+            case "\uD83C\uDDEB\uD83C\uDDEE": //Finnish Finland
+                targetLang = Language.FINNISH;
+                dlLang = "fi";
+                break;
+            case "\uD83C\uDDED\uD83C\uDDFA": //Hungarian Hungary
+                targetLang = Language.HUNGARIAN;
+                dlLang = "hu";
+                break;
+            case "\uD83C\uDDEE\uD83C\uDDE9": //Indonesian Indonesia
+                targetLang = Language.INDONESIAN;
+                dlLang = "id";
+                break;
+            case "\uD83C\uDDF1\uD83C\uDDF9": //Lithuanian Lithuania
+                targetLang = Language.LITHUANIAN;
+                dlLang = "lt";
+                break;
+            case "\uD83C\uDDF3\uD83C\uDDF4": //Norwegian Norway
+                targetLang = Language.NORWEGIAN;
+                dlLang = "nb";
+                break;
+            case "\uD83C\uDDF3\uD83C\uDDF1": //Dutch Netherlands
+                targetLang = Language.DUTCH;
+                dlLang = "nl";
+                break;
+            case "\uD83C\uDDF7\uD83C\uDDF4": //Romanian Romania
+                targetLang = Language.ROMANIAN;
+                dlLang = "ro";
+                break;
+            case "\uD83C\uDDF8\uD83C\uDDEA": //Swedish Sweden
+                targetLang = Language.SWEDISH;
+                dlLang = "sv";
+                break;
+            case "\uD83C\uDDF9\uD83C\uDDF7": //Turkish Turkey
+                targetLang = Language.TURKISH;
+                dlLang = "tr";
+                break;
+            case "\uD83C\uDDFA\uD83C\uDDE6": //Ukrainian Ukraine
+                targetLang = Language.UKRAINIAN;
+                dlLang = "uk";
+                break;
+                //end of new flags/langs
             case "\uD83C\uDDFA\uD83C\uDDF8": //USA English
             case "\uD83C\uDDE8\uD83C\uDDE6": //Canada English
             case "\uD83C\uDDFB\uD83C\uDDEE": //US Virgin Islands English

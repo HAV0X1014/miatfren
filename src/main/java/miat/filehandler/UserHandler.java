@@ -41,8 +41,9 @@ public class UserHandler {
         JSONObject obj = new JSONObject(userConfig);
         if (!obj.has(option)) {
             write(option,new JSONObject(),userID);
+            obj.put(option,new JSONObject()); //version that stays in memory to avoid an error
         }
-        return  obj.getJSONObject(option);
+        return obj.getJSONObject(option);
     }
 
     public static boolean getBoolean(String option, String userID) {
